@@ -1,0 +1,46 @@
+html,
+body {
+	font: 14px monospace;
+  margin: 0;
+  padding: 0;
+}
+
+.wraper {
+	padding: 1px;
+	position: relative;
+}
+
+#input-statement {
+  box-sizing: border-box;
+  border: solid 1px #eee;
+  display: block;
+  font-size: 14px;
+  line-height: 1.5rem;
+  outline: none;
+  overflow: hidden;
+  padding: 5px 15px;
+  resize: none;
+  width: 100%;
+}
+
+.wraper::before {
+  color: #aaa;
+  content: '>';
+  line-height: 1.5rem;
+  margin: 7px 0;
+  position: absolute;
+  left: 5px;
+}
+
+.history {
+
+}
+
+
+.history.history-statement {
+
+}
+
+.history.history-execute-result {
+	
+}
