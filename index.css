@@ -18,13 +18,13 @@ body {
   line-height: 1.5rem;
   outline: none;
   overflow: hidden;
-  padding: 5px 15px;
+  padding: 5px 18px;
   resize: none;
   width: 100%;
 }
 
 .wraper::before {
-  color: #aaa;
+  color: blue;
   content: '>';
   line-height: 1.5rem;
   margin: 7px 0;
@@ -32,15 +32,41 @@ body {
   left: 5px;
 }
 
+#history-statement {
+  margin: 0;
+  padding: 0;
+}
+
+#history-statement > li {
+  border: 1px solid #eee;
+  list-style: none;
+  margin: 1px;
+}
+
+#history-statement > li:nth-child(even) {
+  background: #eee;
+}
+
 .history {
-
+  line-height: 1.5rem;
+  margin: 0;
+  padding: 0 18px;
+  position: relative;
 }
 
 
-.history.history-statement {
-
+.history.history-statement::before {
+  color: #aaa;
+  content: '>';
+  line-height: 1.5rem;
+  position: absolute;
+  left: 5px;
 }
 
-.history.history-execute-result {
-	
+.history.history-execute-result::before {
+	color: #aaa;
+  content: '<';
+  line-height: 1.5rem;
+  position: absolute;
+  left: 5px;
 }
