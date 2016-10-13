@@ -23,11 +23,39 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			}
 		});
 	},
+	formatResult: function(result) {
+		switch(Object.prototype.toString.apply(result)) {
+			case '[object Number]':
+				return result;
+			case '[object Null]':
+				return 'null';
+			case '[object Undefined]':
+				return 'undefined';
+			case '[object String]':
+				return '\'' + result + '\'';
+			case '[object Array]':
+			case '[object Object]':
+				return JSON.stringify(result);
+				return JSON.stringify(result);
+			case '[object Function]':
+			case '[object RegExp]':
+			default:
+				return result.toString();
+		}
+	},
+	evalResult: function(inputValue) {
+		return eval.call(window, inputValue);
+	},
 	executeStatement: function() {
 		var result;
 
 		try {
-			result = eval.call(window, this.inputStatementElement.value);
+			if(/^\{.*\}$/.test(this.inputStatementElement.value)) {
+				this.evalResult('var _1_a_2_d_3_i_4_x_5_m_6_y_7_w_8_ = ' + this.inputStatementElement.value);
+				result = this.formatResult(window._1_a_2_d_3_i_4_x_5_m_6_y_7_w_8_);
+			} else {
+				result = this.formatResult(this.evalResult(this.inputStatementElement.value));
+			}
 		} catch(exception) {
 			result = exception.message;
 		}

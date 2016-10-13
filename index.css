@@ -29,7 +29,7 @@ body {
   line-height: 1.5rem;
   margin: 7px 0;
   position: absolute;
-  left: 5px;
+  left: 7px;
 }
 
 #history-statement {
@@ -52,6 +52,7 @@ body {
   margin: 0;
   padding: 0 18px;
   position: relative;
+  white-space: pre-line;
 }
 
 
