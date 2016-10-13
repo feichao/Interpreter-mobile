@@ -53,6 +53,7 @@ body {
   padding: 0 18px;
   position: relative;
   white-space: pre-line;
+  word-wrap: break-word;
 }
 
 
@@ -65,7 +66,7 @@ body {
 }
 
 .history.history-execute-result::before {
-	color: #aaa;
+	color: green;
   content: '<';
   line-height: 1.5rem;
   position: absolute;

@@ -9,19 +9,26 @@ window.InterpeterMobile = window.InterpeterMobile || {
 
 		this.bindEnterKey();
 	},
-	bindEnterKey: function() {
+	inputChange: function(event) {
 		var self = this;
-		document.addEventListener('keydown', function(event) {
-			if(event.key === 'Enter' || event.keyCode === 13) {
-				event.preventDefault();
-				setTimeout(function() {
-					self.appendToHistory(self.executeStatement());
-					self.clearStatement();
-				}, 0);
-			} else {
-				self.resizeInputElement();
+		
+		if(event.key === 'Enter' || event.keyCode === 13) {
+			event.preventDefault();
+			if(!this.inputStatementElement.value) {
+				return;
 			}
-		});
+
+			setTimeout(function() {
+				self.appendToHistory(self.executeStatement());
+				self.clearStatement();
+			}, 0);
+		} else {
+			this.resizeInputElement();
+		}
+	},
+	bindEnterKey: function() {
+		document.addEventListener('input', this.inputChange.bind(this));
+		document.addEventListener('keydown', this.inputChange.bind(this));
 	},
 	formatResult: function(result) {
 		switch(Object.prototype.toString.apply(result)) {
@@ -72,6 +79,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 	},
 	clearStatement: function() {
 		this.inputStatementElement.value = '';
+		this.inputStatementElement.style.height = 'auto';
 	},
 	createHostoryElement: function(type) {
 		var pre = document.createElement('pre');
