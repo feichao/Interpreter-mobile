@@ -52,7 +52,7 @@ body {
   margin: 0;
   padding: 0 18px;
   position: relative;
-  white-space: pre-line;
+  white-space: pre-wrap;
   word-wrap: break-word;
 }
 
