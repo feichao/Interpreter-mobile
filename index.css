@@ -5,6 +5,26 @@ body {
   padding: 0;
 }
 
+.error {
+  color: red;
+}
+
+.not-important {
+  color: #777;
+}
+
+.num {
+  color: blue;
+}
+
+.str {
+  color: brown;
+}
+
+.func {
+  color: #8b008b; //darkmagenta;
+}
+
 .wraper {
 	padding: 1px;
 	position: relative;
@@ -44,7 +64,7 @@ body {
 }
 
 #history-statement > li:nth-child(even) {
-  background: #eee;
+  background: #efefef;
 }
 
 .history {
@@ -56,19 +76,20 @@ body {
   word-wrap: break-word;
 }
 
-
-.history.history-statement::before {
-  color: #aaa;
-  content: '>';
+.history.history-statement::before,
+.history.history-execute-result::before {
   line-height: 1.5rem;
   position: absolute;
   left: 5px;
 }
 
+.history.history-statement::before,
+.history.history-execute-result::before {
+  color: #aaa;
+  content: '>';
+}
+
 .history.history-execute-result::before {
 	color: green;
   content: '<';
-  line-height: 1.5rem;
-  position: absolute;
-  left: 5px;
 }

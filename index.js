@@ -2,6 +2,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 	inputStatementElement: undefined,
 	historyStatementWraper: undefined,
 	historyPreCode: undefined,
+	logStr: [],
 	init: function() {
 		this.inputStatementElement = document.getElementById('input-statement');
 		this.historyStatementWraper = document.getElementById('history-statement');
@@ -24,6 +25,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			}, 0);
 		} else {
 			this.resizeInputElement();
+			this.logStr = [];
 		}
 	},
 	bindEnterKey: function() {
@@ -33,22 +35,31 @@ window.InterpeterMobile = window.InterpeterMobile || {
 	formatResult: function(result) {
 		switch(Object.prototype.toString.apply(result)) {
 			case '[object Number]':
-				return result;
+				return '<span class="num">' + result + '</span>';
 			case '[object Null]':
-				return 'null';
+				return '<span class="not-important">null</span>';
 			case '[object Undefined]':
-				return 'undefined';
+				return '<span class="not-important">undefined</span>';
 			case '[object String]':
-				return '\'' + result + '\'';
-			case '[object Array]':
-			case '[object Object]':
-				return JSON.stringify(result);
-				return JSON.stringify(result);
-			case '[object Function]':
+				return '"<span class="str">' + result + '</span>"';
 			case '[object RegExp]':
+				return '<span class="str">' + result + '</span>';
+			case '[object Array]':
+				return '[ ' + result.map((function(r) { return this.formatResult(r); }).bind(this)).join(', ') + ' ]';
+			case '[object Object]':
+				var str = [], randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+				for(var key in result) {
+					str.push(this.formatResult(key) + ': ' + this.formatResult(result[key]));
+				}
+				return '<span style="color: ' + randomColor + '">{ </span>' + str.join(', ') + '<span style="color: ' + randomColor + '"> }</span>';
+			case '[object Function]':
 			default:
-				return result.toString();
+				return result.toString().replace('function', '<span class="func">function</span>');
 		}
+	},
+	appendLogInfo: function(result) {
+		this.logStr.push(result);
+		return this.logStr.join('<br/>');
 	},
 	evalResult: function(inputValue) {
 		return eval.call(window, inputValue);
@@ -64,12 +75,12 @@ window.InterpeterMobile = window.InterpeterMobile || {
 				result = this.formatResult(this.evalResult(this.inputStatementElement.value));
 			}
 		} catch(exception) {
-			result = exception.message;
+			result = '<span class="error">' + exception.message + '</span>';
 		}
 
 		return {
 			statement: this.inputStatementElement.value,
-			executeResult: result
+			executeResult: this.appendLogInfo(result)
 		};
 	},
 	resizeInputElement: function() {
@@ -98,12 +109,17 @@ window.InterpeterMobile = window.InterpeterMobile || {
 		historyWarper.appendChild(nodeStatement);
 
 		var nodeExecuteResult = this.createHostoryElement('execute-result');
-		nodeExecuteResult.children[0].innerText = result.executeResult;
+		nodeExecuteResult.children[0].innerHTML = result.executeResult;
 		historyWarper.appendChild(nodeExecuteResult);
-
 		this.historyStatementWraper.appendChild(historyWarper);
 	},
 };
+
+console._o_l_d_l_o_g_ = console.log;
+console.log = function(str) {  
+  console._o_l_d_l_o_g_(str);  
+  InterpeterMobile.logStr.push(str);
+}  
 
 window.onload = function() {
 	InterpeterMobile.init();
