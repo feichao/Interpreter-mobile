@@ -2,15 +2,17 @@
 (function() {
 	var interpeterLog = {};
 	for(var key in console) {
-		interpeterLog[key] = console[key];
+		if(typeof console[key] === 'function') {
+			interpeterLog[key] = console[key];
 
-		console[key] = (function() {
-			var keyClusore = key;
-			return function(str) {
-				interpeterLog[keyClusore](str);
-				InterpeterMobile.consoleLog.push(str);
-			}
-		})();
+			console[key] = (function() {
+				var keyClusore = key;
+				return function(str) {
+					interpeterLog[keyClusore].call(window.console, str);
+					InterpeterMobile.consoleLog.push(str);
+				}
+			})();
+		}
 	}
 })();
 
@@ -106,6 +108,10 @@ window.InterpeterHistory.prototype.setHistory = function() {
 
 // other libs
 window.InterpeterLibs = window.InterpeterLibs || {
+	init: function() {
+		document.getElementById('more-key').addEventListener('click', this.showLibList);
+		document.getElementById('hide-side-bar').addEventListener('click', this.hideLibList);
+	},
 	load: function(url) {
 		if(url) {
 			var script = document.createElement('script');
@@ -116,7 +122,13 @@ window.InterpeterLibs = window.InterpeterLibs || {
 		}
 	},
 	remove: function() {
-		
+
+	},
+	showLibList: function() {
+		document.getElementById('side-bar').className = 'side-bar show';
+	},
+	hideLibList: function() {
+		document.getElementById('side-bar').className = 'side-bar';
 	}
 }
 
@@ -292,8 +304,9 @@ window.InterpeterMobile = window.InterpeterMobile || {
 
 		return this;
 	},
-};  
+};
 
 window.onload = function() {
 	InterpeterMobile.init();
+	InterpeterLibs.init();
 };
