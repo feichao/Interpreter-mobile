@@ -1,3 +1,18 @@
+window.InterpeterLog = window.InterpeterLog = {};
+(function() {
+	for(var key in console) {
+		window.InterpeterLog[key] = console[key];
+
+		console[key] = (function() {
+			var keyClusore = key;
+			return function(str) {
+				window.InterpeterLog[keyClusore](str);
+				InterpeterMobile.logStr.push(str);
+			}
+		})();
+	}
+})();
+
 window.InterpeterMobile = window.InterpeterMobile || {
 	inputStatementElement: undefined,
 	historyStatementWraper: undefined,
@@ -8,7 +23,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 		this.historyStatementWraper = document.getElementById('history-statement');
 		this.historyPreCode = document.getElementById('history-precode');
 
-		this.bindEnterKey();
+		this.bindEvent();
 	},
 	inputChange: function(event) {
 		var self = this;
@@ -28,7 +43,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			this.logStr = [];
 		}
 	},
-	bindEnterKey: function() {
+	bindEvent: function() {
 		document.addEventListener('input', this.inputChange.bind(this));
 		document.addEventListener('keydown', this.inputChange.bind(this));
 	},
@@ -113,13 +128,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 		historyWarper.appendChild(nodeExecuteResult);
 		this.historyStatementWraper.appendChild(historyWarper);
 	},
-};
-
-console._o_l_d_l_o_g_ = console.log;
-console.log = function(str) {  
-  console._o_l_d_l_o_g_(str);  
-  InterpeterMobile.logStr.push(str);
-}  
+};  
 
 window.onload = function() {
 	InterpeterMobile.init();
