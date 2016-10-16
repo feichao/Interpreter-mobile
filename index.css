@@ -131,10 +131,45 @@ body {
   background-size: 15px 4px;
 }
 
+.side-bar {
+  background: rgba(0,0,0,0.4);
+  height: 100%;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+#lib-list {
+  background: #fff;
+  height: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 180px;
+}
+
+#lib-list > h4 {
+  margin: 0;
+  padding: 10px 2px;
+}
+
+#lib-list > li {
+  padding: 2px 4px;
+}
+
+#lib-list > li > label {
+  display: block;
+}
+
+#lib-list > li > label > input {
+  vertical-align: middle
+}
+
 @media (min-width: 480px) {
   .btn-list > button {
     width: 115px;
   }
 }
+
 
 

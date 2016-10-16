@@ -14,7 +14,7 @@
 	}
 })();
 
-// bind textarea event
+// textarea
 window.InterpeterTextarea = function(textarea) {
 	var self = this;
 
@@ -103,6 +103,22 @@ window.InterpeterHistory.prototype.getHistory = function() {
 window.InterpeterHistory.prototype.setHistory = function() {
 	return localStorage.setItem(this.HISTORY_KEY, JSON.stringify(this.history));
 };
+
+// other libs
+window.InterpeterLibs = window.InterpeterLibs || {
+	load: function(url) {
+		if(url) {
+			var script = document.createElement('script');
+			script.src = url;
+			script.onload = function() {
+
+			};
+		}
+	},
+	remove: function() {
+		
+	}
+}
 
 // main
 window.InterpeterMobile = window.InterpeterMobile || {
