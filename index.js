@@ -139,6 +139,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			return;
 		}
 
+		this.consoleLog = [];
 		if(this.historyIndex < 0) {
 			this.textarea.setValue('');
 			return;
@@ -155,6 +156,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			return;
 		}
 
+		this.consoleLog = [];
 		if(this.historyIndex >= this.historyStorage.getHistory().length) {
 			this.textarea.setValue('');
 			return;
@@ -172,10 +174,8 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			this.onEnterKey();
 		} else if(event.key === 'ArrowUp' || event.keyCode === 38) {
 			this.getPreHistoryValue();
-			this.consoleLog = [];
 		} else if(event.key === 'ArrowDown' || event.keyCode === 40) {
 			this.getNextHistoryValue();
-			this.consoleLog = [];
 		} else {
 			this.consoleLog = [];
 		}
