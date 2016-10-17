@@ -278,7 +278,7 @@ window.InterpeterLibs = window.InterpeterLibs || {
 
 		if(isChanged) {
 			setTimeout(function() {
-				window.location = window.location + '?t=' + +new Date();
+				window.location = window.location.host + '?t=' + +new Date();
 			}, 100);
 		}
 	},
@@ -305,7 +305,8 @@ window.InterpeterLibs = window.InterpeterLibs || {
 		var name = document.getElementById('add-lib-name').value;
 		var url = document.getElementById('add-lib-url').value;
 
-		if(name === undefined || url === undefined) {
+		if(!name || !url) {
+			this.hideAddLibDialog();
 			window.InterpeterMobile.appendToHistoryMsgError('please input name & url');
 			return;
 		}
@@ -316,7 +317,7 @@ window.InterpeterLibs = window.InterpeterLibs || {
 			isLoad: true
 		});
 
-		window.location = window.location + '?t=' + +new Date();
+		window.location = window.location.host + '?t=' + +new Date();
 	}
 }
 
@@ -447,7 +448,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 		var value = inputValue;
 		if(window.InterpeterLibs.isBabelOn()) {
 			try {
-				value = Babel.transform(value, { presets: ['es2015-loose'] }).code.replace('use strict', '');
+				value = Babel.transform(value, { presets: ['es2015'] }).code.replace('"use strict"', '');
 			} catch (exception) {
 				throw(exception);
 			}
