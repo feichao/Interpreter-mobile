@@ -65,13 +65,30 @@ window.InterpeterTextarea.prototype.clearValue = function() {
 };
 
 // storage
+window.InterpeterStorage = {
+	getItem: function(key) {
+		try {
+			return JSON.parse(localStorage.getItem(key));
+		} catch(exception) {
+			return null;
+		}
+	},
+	setItem: function(key, value) {
+		localStorage.setItem(key, JSON.stringify(value));
+	}
+};
+
+// history storage
 window.InterpeterHistory = function() {
 	try {
-		this.history = JSON.parse(localStorage.getItem(this.HISTORY_KEY)) || [];
+		this.history = this.getItem(this.HISTORY_KEY) || [];
 	} catch(exception) {
 		this.history = [];
 	}
 };
+
+window.InterpeterHistory.prototype = Object.create(window.InterpeterStorage);
+window.InterpeterHistory.prototype.constructor = window.InterpeterHistory;
 
 window.InterpeterHistory.prototype.HISTORY_KEY = 'interpeter-history';
 window.InterpeterHistory.prototype.MAX_LENGTH = 99;
@@ -103,32 +120,95 @@ window.InterpeterHistory.prototype.getHistory = function() {
 };
 
 window.InterpeterHistory.prototype.setHistory = function() {
-	return localStorage.setItem(this.HISTORY_KEY, JSON.stringify(this.history));
+	return this.setItem(this.HISTORY_KEY, this.history);
 };
 
 // other libs
-window.InterpeterLibs = window.InterpeterLibs || {
-	init: function() {
-		document.getElementById('more-key').addEventListener('click', this.showLibList);
-		document.getElementById('hide-side-bar').addEventListener('click', this.hideLibList);
-	},
-	load: function(url) {
-		if(url) {
-			var script = document.createElement('script');
-			script.src = url;
-			script.onload = function() {
+window.InterpeterLibsStorage = function() {
+	try {
+		this.libs = this.getItem(this.LIBS_KEY) || {};
+	} catch(exception) {
+		this.libs = {};
+	}
+};
+window.InterpeterLibsStorage.prototype = Object.create(window.InterpeterStorage);
+window.InterpeterLibsStorage.prototype.constructor = window.InterpeterHistory;
 
+window.InterpeterLibsStorage.prototype.LIBS_KEY = 'libs-list';
+
+window.InterpeterLibsStorage.prototype.add = function(key, value) {
+	this.libs[key] = value;
+	this.setLibs();
+};
+
+window.InterpeterLibsStorage.prototype.remove = function(key) {
+	delete this.libs[key];
+	this.setLibs();
+};
+
+window.InterpeterLibsStorage.prototype.clear = function(item) {
+	this.libs = {};
+	this.setLibs();
+};
+
+window.InterpeterLibsStorage.prototype.getLibs = function() {
+	return this.libs;
+};
+
+window.InterpeterLibsStorage.prototype.setLibs = function() {
+	return this.setItem(this.LIBS_KEY, this.libs);
+};
+
+window.InterpeterLibs = window.InterpeterLibs || {
+	libList: {
+		'jQuery 2.2.1': 'http://cdn.staticfile.org/jquery/2.2.1/jquery.min.js',
+		'Babel for ES6': ''
+	},
+	storageLibs: new window.InterpeterLibsStorage,
+	init: function() {
+		for(var key in this.libList) {
+			this.storageLibs.add(key, this.libList[key]);
+		}
+		document.getElementById('more-key').addEventListener('click', this.showLibList.bind(this));
+		document.getElementById('hide-side-bar').addEventListener('click', this.hideLibList.bind(this));
+	},
+	load: function(key) {
+		if(this.libList[key]) {
+			var script = document.createElement('script');
+			script.src = this.libList[key];
+			script.onload = function() {
+				console.log('success');
 			};
+			document.body.appendChild(script);
+		}
+	},
+	loadLibs: function() {
+		var scripts = document.getElementsByTagName('script');
+		console.log(scripts);
+		for(var index = 0; index < scripts.length; index++) {
+			console.log(scripts[index].src);
+			if(scripts[index].src !== 'index.js') {
+				document.body.removeChild(scripts[index]);
+			}
+		}
+
+		var checkList = document.getElementsByName('libs-list');
+		for(index = 0; index < checkList.length; index++) {
+			if(checkList[index].checked) {
+				this.load(checkList[index].value);
+			}
 		}
 	},
 	remove: function() {
 
 	},
-	showLibList: function() {
+	showLibList: function(event) {
 		document.getElementById('side-bar').className = 'side-bar show';
 	},
-	hideLibList: function() {
+	hideLibList: function(event) {
 		document.getElementById('side-bar').className = 'side-bar';
+
+		this.loadLibs();
 	}
 }
 
