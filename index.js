@@ -132,7 +132,7 @@ window.InterpeterLibsStorage = function() {
 			isLoad: false,
 		}, {
 			name: 'Babel for ES6',
-			url: 'http://7xlphe.com1.z0.glb.clouddn.com/btib.min.js',
+			url: 'http://7xlphe.com1.z0.glb.clouddn.com/babel.min.js',
 			isLoad: false,
 		}];
 	} catch(exception) {
@@ -187,6 +187,16 @@ window.InterpeterLibsStorage.prototype.setLibs = function() {
 	return this.setItem(this.LIBS_KEY, this.libs);
 };
 
+window.InterpeterLibsStorage.prototype.isBabelOn = function() {
+	for(var i = 0; i < this.libs.length; i++) {
+		if(this.libs[i].name === 'Babel for ES6' && this.libs[i].isLoad) {
+			return true;
+		}
+	}
+
+	return false;
+};
+
 window.InterpeterLibs = window.InterpeterLibs || {
 	libListElement: undefined,
 	addLibWrapper: undefined,
@@ -203,6 +213,9 @@ window.InterpeterLibs = window.InterpeterLibs || {
 		this.libListElement = document.getElementById('lib-list');
 		this.addLibWrapper = document.getElementById('add-lib');
 		this.loadLibs();
+	},
+	isBabelOn: function() {
+		return this.storageLibs.isBabelOn();
 	},
 	loadLibs: function() {
 		var self = this;
@@ -265,7 +278,7 @@ window.InterpeterLibs = window.InterpeterLibs || {
 
 		if(isChanged) {
 			setTimeout(function() {
-				window.location.reload();
+				window.location = window.location + '?t=' + +new Date();
 			}, 100);
 		}
 	},
@@ -303,7 +316,7 @@ window.InterpeterLibs = window.InterpeterLibs || {
 			isLoad: true
 		});
 
-		window.location.reload();
+		window.location = window.location + '?t=' + +new Date();
 	}
 }
 
@@ -431,7 +444,16 @@ window.InterpeterMobile = window.InterpeterMobile || {
 		return this.consoleLog.join('<br/>');
 	},
 	evalResult: function(inputValue) {
-		return eval.call(window, inputValue);
+		var value = inputValue;
+		if(window.InterpeterLibs.isBabelOn()) {
+			try {
+				value = Babel.transform(value, { presets: ['es2015-loose'] }).code.replace('use strict', '');
+			} catch (exception) {
+				throw(exception);
+			}
+		}
+
+		return eval.call(window, value);
 	},
 	executeStatement: function() {
 		var textareaValue = this.textarea.getValue();
