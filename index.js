@@ -278,7 +278,7 @@ window.InterpeterLibs = window.InterpeterLibs || {
 
 		if(isChanged) {
 			setTimeout(function() {
-				window.location = window.location.host + '?t=' + +new Date();
+				window.location.search = '?t=' + +new Date();
 			}, 100);
 		}
 	},
@@ -317,7 +317,7 @@ window.InterpeterLibs = window.InterpeterLibs || {
 			isLoad: true
 		});
 
-		window.location = window.location.host + '?t=' + +new Date();
+		window.location.search = '?t=' + +new Date();
 	}
 }
 
