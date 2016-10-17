@@ -126,9 +126,17 @@ window.InterpeterHistory.prototype.setHistory = function() {
 // other libs
 window.InterpeterLibsStorage = function() {
 	try {
-		this.libs = this.getItem(this.LIBS_KEY) || {};
+		this.libs = this.getItem(this.LIBS_KEY) || [{
+			name: 'jQuery 2.2.1',
+			url: 'http://7xlphe.com1.z0.glb.clouddn.com/jquery.min.js',
+			isLoad: false,
+		}, {
+			name: 'Babel for ES6',
+			url: 'http://7xlphe.com1.z0.glb.clouddn.com/btib.min.js',
+			isLoad: false,
+		}];
 	} catch(exception) {
-		this.libs = {};
+		this.libs = [];
 	}
 };
 window.InterpeterLibsStorage.prototype = Object.create(window.InterpeterStorage);
@@ -136,18 +144,38 @@ window.InterpeterLibsStorage.prototype.constructor = window.InterpeterHistory;
 
 window.InterpeterLibsStorage.prototype.LIBS_KEY = 'libs-list';
 
-window.InterpeterLibsStorage.prototype.add = function(key, value) {
-	this.libs[key] = value;
+window.InterpeterLibsStorage.prototype.add = function(newLib) {
+	var isExist = this.libs.filter(function(lib) {
+		if(lib.name === newLib.name) {
+			lib.url = newLib.url;
+			lib.isLoad = newLib.isLoad;
+			return true;
+		}
+
+		return false;
+	}).length > 0;
+
+	if(!isExist) {
+		this.libs.push({
+			name: newLib.name,
+			url: newLib.url,
+			isLoad: newLib.isLoad
+		});
+	}
+
 	this.setLibs();
 };
 
 window.InterpeterLibsStorage.prototype.remove = function(key) {
-	delete this.libs[key];
+	this.libs = this.libs.filter(function(lib) {
+		return lib.name === key;
+	});
+
 	this.setLibs();
 };
 
 window.InterpeterLibsStorage.prototype.clear = function(item) {
-	this.libs = {};
+	this.libs = [];
 	this.setLibs();
 };
 
@@ -160,55 +188,122 @@ window.InterpeterLibsStorage.prototype.setLibs = function() {
 };
 
 window.InterpeterLibs = window.InterpeterLibs || {
-	libList: {
-		'jQuery 2.2.1': 'http://cdn.staticfile.org/jquery/2.2.1/jquery.min.js',
-		'Babel for ES6': ''
-	},
+	libListElement: undefined,
+	addLibWrapper: undefined,
 	storageLibs: new window.InterpeterLibsStorage,
 	init: function() {
-		for(var key in this.libList) {
-			this.storageLibs.add(key, this.libList[key]);
-		}
-		document.getElementById('more-key').addEventListener('click', this.showLibList.bind(this));
-		document.getElementById('hide-side-bar').addEventListener('click', this.hideLibList.bind(this));
-	},
-	load: function(key) {
-		if(this.libList[key]) {
-			var script = document.createElement('script');
-			script.src = this.libList[key];
-			script.onload = function() {
-				console.log('success');
-			};
-			document.body.appendChild(script);
-		}
+
+		document.getElementById('more-key').addEventListener('click', this.showinitLibs.bind(this));
+		document.getElementById('hide-side-bar').addEventListener('click', this.hideinitLibs.bind(this));
+
+		document.getElementById('add-key').addEventListener('click', this.showAddLibDialog.bind(this));
+		document.getElementById('add-lib-ok').addEventListener('click', this.addLib.bind(this));
+		document.getElementById('add-lib-cancel').addEventListener('click', this.hideAddLibDialog.bind(this));
+
+		this.libListElement = document.getElementById('lib-list');
+		this.addLibWrapper = document.getElementById('add-lib');
+		this.loadLibs();
 	},
 	loadLibs: function() {
-		var scripts = document.getElementsByTagName('script');
-		console.log(scripts);
-		for(var index = 0; index < scripts.length; index++) {
-			console.log(scripts[index].src);
-			if(scripts[index].src !== 'index.js') {
-				document.body.removeChild(scripts[index]);
+		var self = this;
+
+		this.storageLibs.getLibs().forEach(function(lib) {
+
+			if(lib.isLoad && lib.url) {
+				var script = document.createElement('script');
+				script.src = lib.url;
+				script.onload = function() {
+					window.InterpeterMobile.appendToHistoryMsgSuccess('Load ' + lib.name + ' success!');
+				};
+				script.onerror = function() {
+					window.InterpeterMobile.appendToHistoryMsgError('Load ' + lib.name + ' fail!');
+				};
+
+				document.body.appendChild(script);
+				window.InterpeterMobile.appendToHistoryMsg('Load ' + lib.name + '...');
 			}
+
+			self.appendLib(lib);
+		});
+	},
+	appendLib: function(lib) {
+		var li = document.createElement('li');
+		var label = document.createElement('label');
+		var input = document.createElement('input');
+		input.name = 'libs-list';
+		input.type = 'checkbox';
+		input.value = lib.name;
+		var span = document.createElement('span');
+		span.innerText = lib.name;
+
+		if(lib.isLoad) {
+			input.checked = 'checked';
 		}
 
+		label.appendChild(input);
+		label.appendChild(span);
+		li.appendChild(label);
+
+		this.libListElement.appendChild(li);
+	},
+	setLibsState: function(cb) {
 		var checkList = document.getElementsByName('libs-list');
-		for(index = 0; index < checkList.length; index++) {
-			if(checkList[index].checked) {
-				this.load(checkList[index].value);
+		var isChanged = false;
+		this.storageLibs.getLibs().forEach(function(lib) {
+			for(var index = 0; index < checkList.length; index++) {
+				if(lib.name === checkList[index].value) {
+					if(lib.isLoad !== checkList[index].checked) {
+						isChanged = true;
+					}
+
+					lib.isLoad = checkList[index].checked;
+				}
 			}
+		});
+
+		this.storageLibs.setLibs();
+
+		if(isChanged) {
+			setTimeout(function() {
+				window.location.reload();
+			}, 100);
 		}
 	},
-	remove: function() {
-
-	},
-	showLibList: function(event) {
+	showinitLibs: function(event) {
 		document.getElementById('side-bar').className = 'side-bar show';
 	},
-	hideLibList: function(event) {
+	hideinitLibs: function(event) {
+		var self = this;
+
 		document.getElementById('side-bar').className = 'side-bar';
 
-		this.loadLibs();
+		setTimeout(function() {
+			self.setLibsState();
+		}, 400);
+	},
+	showAddLibDialog: function(event) {
+		this.addLibWrapper.className = 'add-lib-wrap show';
+		this.hideinitLibs();
+	},
+	hideAddLibDialog: function(event) {
+		this.addLibWrapper.className = 'add-lib-wrap';
+	},
+	addLib: function(event) {
+		var name = document.getElementById('add-lib-name').value;
+		var url = document.getElementById('add-lib-url').value;
+
+		if(name === undefined || url === undefined) {
+			window.InterpeterMobile.appendToHistoryMsgError('please input name & url');
+			return;
+		}
+
+		this.storageLibs.add({
+			name: name,
+			url: url,
+			isLoad: true
+		});
+
+		window.location.reload();
 	}
 }
 
@@ -383,6 +478,24 @@ window.InterpeterMobile = window.InterpeterMobile || {
 		this.historyStatementWraper.appendChild(historyWarper);
 
 		return this;
+	},
+	_appendToHistoryMsg: function(type, msg) {
+		var historyWarper = document.createElement('li');
+
+		var nodeStatement = this.createHostoryElement('statement');
+		nodeStatement.children[0].innerHTML = '<span class="' + type + '">' + msg + '</span>';
+		historyWarper.appendChild(nodeStatement);
+
+		this.historyStatementWraper.appendChild(historyWarper);
+	},
+	appendToHistoryMsg: function(msg) {
+		this._appendToHistoryMsg('not-important', msg);
+	},
+	appendToHistoryMsgSuccess: function(msg) {
+		this._appendToHistoryMsg('success', msg);
+	},
+	appendToHistoryMsgError: function(msg) {
+		this._appendToHistoryMsg('error', msg);
 	},
 };
 

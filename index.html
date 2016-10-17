@@ -23,18 +23,26 @@
 	<div id="side-bar" class="side-bar">
 		<ul id="lib-list">
 			<h4>Load Libs...</h4>
-			<li>
-				<label>
-					<input name="libs-list" type="checkbox" value="Babel for ES6"><span>Babel for ES6</span>
-				</label>
-			</li>
-			<li>
-				<label>
-					<input name="libs-list" type="checkbox" value="jQuery 2.2.1"><span>jQuery 2.2.1</span>
-				</label>
-			</li>
 		</ul>
+		<button id="add-key"></button>
 		<div id="hide-side-bar" class="hide-side-bar"></div>
+	</div>
+
+	<div id="add-lib" class="add-lib-wrap">
+		<div class="add-lib">
+			<label>
+				<span>Name</span>
+				<input id="add-lib-name" type="text">
+			</label>
+			<label>
+				<span>URL</span>
+				<textarea id="add-lib-url" rows="3"></textarea>
+			</label>
+			<div class="actions">
+				<button id="add-lib-ok">OK</button>
+				<button id="add-lib-cancel">Cancel</button>
+			</div>
+		</div>
 	</div>
 	<script type="text/javascript" src="index.js"></script>
 </body>
