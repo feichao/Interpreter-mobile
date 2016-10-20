@@ -411,9 +411,9 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			return;
 		}
 
-		self.appendToHistoryInput(this.textarea.getValue());
-
 		setTimeout(function() {
+			self.appendToHistoryInput(self.textarea.getValue());
+			
 			// 先执行结果，如果有 console，先 console
 			var result = self.executeStatement();
 			setTimeout(function() {
