@@ -9,7 +9,9 @@
 				var keyClusore = key;
 				return function(str) {
 					interpeterLog[keyClusore].call(window.console, str);
-					InterpeterMobile.consoleLog.push(str);
+					setTimeout(function() {
+						window.InterpeterMobile.appendToHistoryInput(str);
+					}, 0);
 				}
 			})();
 		}
@@ -238,7 +240,7 @@ window.InterpeterLibs = window.InterpeterLibs || {
 				};
 
 				document.body.appendChild(script);
-				window.InterpeterMobile.appendToHistoryMsg('Load ' + lib.name + '...');
+				window.InterpeterMobile.appendToHistoryMsgGrey('Load ' + lib.name + '...');
 			}
 
 			self.appendLib(lib);
@@ -337,7 +339,6 @@ window.InterpeterMobile = window.InterpeterMobile || {
 	historyStorage: new window.InterpeterHistory,
 	historyStatementWraper: undefined,
 	historyPreCode: undefined,
-	consoleLog: [],
 	init: function() {
 		this.textarea = new window.InterpeterTextarea(document.getElementById('input-statement'));
 
@@ -365,7 +366,6 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			return;
 		}
 
-		this.consoleLog = [];
 		if(this.historyIndex < 0) {
 			this.textarea.setValue('');
 			return;
@@ -382,7 +382,6 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			return;
 		}
 
-		this.consoleLog = [];
 		if(this.historyIndex >= this.historyStorage.getHistory().length) {
 			this.textarea.setValue('');
 			return;
@@ -403,18 +402,24 @@ window.InterpeterMobile = window.InterpeterMobile || {
 		} else if(event.key === 'ArrowDown' || event.keyCode === 40) {
 			this.getNextHistoryValue();
 		} else {
-			this.consoleLog = [];
 		}
 	},
 	onEnterKey: function() {
 		var self = this;
 
 		if(!this.textarea.getValue()) {
-				return;
-			}
+			return;
+		}
+
+		self.appendToHistoryInput(this.textarea.getValue());
 
 		setTimeout(function() {
-			self.appendToHistory(self.executeStatement()).end();
+			// 先执行结果，如果有 console，先 console
+			var result = self.executeStatement();
+			setTimeout(function() {
+				// 再输出结果
+				self.appendToHistoryResult(result).end();
+			}, 0);
 		}, 0);
 	},
 	bindEvent: function() {
@@ -449,10 +454,6 @@ window.InterpeterMobile = window.InterpeterMobile || {
 				return result.toString().replace('function', '<span class="func">function</span>');
 		}
 	},
-	appendLogInfo: function(result) {
-		this.consoleLog.push(result);
-		return this.consoleLog.join('<br/>');
-	},
 	evalResult: function(inputValue) {
 		var value = inputValue;
 		if(window.InterpeterLibs.isBabelOn()) {
@@ -480,10 +481,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 			result = '<span class="error">' + exception.message + '</span>';
 		}
 
-		return {
-			statement: textareaValue,
-			executeResult: this.appendLogInfo(result)
-		};
+		return result;
 	},
 	createHostoryElement: function(type) {
 		var pre = document.createElement('pre');
@@ -497,15 +495,11 @@ window.InterpeterMobile = window.InterpeterMobile || {
 	clearHistoryElement: function(event) {
 		this.historyStatementWraper.innerHTML = '';
 	},
-	appendToHistory: function(result) {
+	appendToHistoryResult: function(result) {
 		var historyWarper = document.createElement('li');
 
-		var nodeStatement = this.createHostoryElement('statement');
-		nodeStatement.children[0].innerText = result.statement;
-		historyWarper.appendChild(nodeStatement);
-
 		var nodeExecuteResult = this.createHostoryElement('execute-result');
-		nodeExecuteResult.children[0].innerHTML = result.executeResult;
+		nodeExecuteResult.children[0].innerHTML = result;
 		historyWarper.appendChild(nodeExecuteResult);
 		this.historyStatementWraper.appendChild(historyWarper);
 
@@ -521,6 +515,9 @@ window.InterpeterMobile = window.InterpeterMobile || {
 		this.historyStatementWraper.appendChild(historyWarper);
 	},
 	appendToHistoryMsg: function(msg) {
+		this._appendToHistoryMsg('', msg);
+	},
+	appendToHistoryMsgGrey: function(msg) {
 		this._appendToHistoryMsg('not-important', msg);
 	},
 	appendToHistoryMsgSuccess: function(msg) {
@@ -528,6 +525,15 @@ window.InterpeterMobile = window.InterpeterMobile || {
 	},
 	appendToHistoryMsgError: function(msg) {
 		this._appendToHistoryMsg('error', msg);
+	},
+	appendToHistoryInput: function(msg) {
+		var historyWarper = document.createElement('li');
+
+		var nodeStatement = this.createHostoryElement('statement');
+		nodeStatement.children[0].innerText = msg;
+		historyWarper.appendChild(nodeStatement);
+
+		this.historyStatementWraper.appendChild(historyWarper);
 	},
 };
 
