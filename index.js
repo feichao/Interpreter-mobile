@@ -126,7 +126,13 @@ window.InterpeterHistory.prototype.setHistory = function() {
 // other libs
 window.InterpeterLibsStorage = function() {
 	try {
-		this.libs = this.getItem(this.LIBS_KEY) || [{
+		this.libs = this.getItem(this.LIBS_KEY) || [];
+	} catch(exception) {
+		this.libs = [];
+	}
+
+	if(this.libs.length <= 0) {
+		this.libs = [{
 			name: 'jQuery 2.2.1',
 			url: 'http://7xlphe.com1.z0.glb.clouddn.com/jquery.min.js',
 			isLoad: false,
@@ -135,8 +141,6 @@ window.InterpeterLibsStorage = function() {
 			url: 'http://7xlphe.com1.z0.glb.clouddn.com/babel.min.js',
 			isLoad: false,
 		}];
-	} catch(exception) {
-		this.libs = [];
 	}
 };
 window.InterpeterLibsStorage.prototype = Object.create(window.InterpeterStorage);
@@ -205,6 +209,7 @@ window.InterpeterLibs = window.InterpeterLibs || {
 
 		document.getElementById('more-key').addEventListener('click', this.showinitLibs.bind(this));
 		document.getElementById('hide-side-bar').addEventListener('click', this.hideinitLibs.bind(this));
+		document.getElementById('delete-lib-key').addEventListener('click', this.deleteLib.bind(this));
 
 		document.getElementById('add-key').addEventListener('click', this.showAddLibDialog.bind(this));
 		document.getElementById('add-lib-ok').addEventListener('click', this.addLib.bind(this));
@@ -293,6 +298,10 @@ window.InterpeterLibs = window.InterpeterLibs || {
 		setTimeout(function() {
 			self.setLibsState();
 		}, 400);
+	},
+	deleteLib: function(event) {
+		this.storageLibs.clear();
+		window.location.search = '?t=' + +new Date();
 	},
 	showAddLibDialog: function(event) {
 		this.addLibWrapper.className = 'add-lib-wrap show';
