@@ -349,12 +349,12 @@ window.InterpeterMobile = window.InterpeterMobile || {
 
 		this.bindEvent();
 	},
-	end: function() {
+	end: function(textareaValue) {
 		if(this.historyIndex < this.historyStorage.getHistory().length - 1) {
-			this.historyStorage.remove(this.textarea.getValue());
+			this.historyStorage.remove(textareaValue);
 		}
 
-		this.historyStorage.add(this.textarea.getValue());
+		this.historyStorage.add(textareaValue);
 		this.historyIndex = this.historyStorage.getHistory().length - 1;
 
 		this.textarea.clearValue();
@@ -406,19 +406,22 @@ window.InterpeterMobile = window.InterpeterMobile || {
 	},
 	onEnterKey: function() {
 		var self = this;
+		var inputValue = this.textarea.getValue();
 
-		if(!this.textarea.getValue()) {
+		if(!inputValue) {
 			return;
 		}
 
+		this.end(inputValue);
+
 		setTimeout(function() {
-			self.appendToHistoryInput(self.textarea.getValue());
-			
+			self.appendToHistoryInput(inputValue);
+
+			var result = self.executeStatement(inputValue);
 			// 先执行结果，如果有 console，先 console
-			var result = self.executeStatement();
 			setTimeout(function() {
 				// 再输出结果
-				self.appendToHistoryResult(result).end();
+				self.appendToHistoryResult(result);
 			}, 0);
 		}, 0);
 	},
@@ -466,8 +469,7 @@ window.InterpeterMobile = window.InterpeterMobile || {
 
 		return eval.call(window, value);
 	},
-	executeStatement: function() {
-		var textareaValue = this.textarea.getValue();
+	executeStatement: function(textareaValue) {
 		var result;
 
 		try {
