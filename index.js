@@ -543,3 +543,9 @@ window.onload = function() {
 	InterpeterMobile.init();
 	InterpeterLibs.init();
 };
+
+// register service worker
+if (navigator && navigator.serviceWorker) {
+  navigator.serviceWorker.register('service_worker.js').then(function (registration) {
+  });
+}

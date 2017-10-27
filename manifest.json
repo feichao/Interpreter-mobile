@@ -1,0 +1,15 @@
+{
+  "name": "Interpreter Mobile",
+  "short_name": "I-Mob",
+  "display": "I-Mobile",
+  "start_url": "/",
+  "theme_color": "black",
+  "background_color": "white",
+  "icons": [
+    {
+      "src": "fav.ico",
+      "sizes": "256x256",
+      "type": "image/x-icon"
+    }
+  ]
+}
