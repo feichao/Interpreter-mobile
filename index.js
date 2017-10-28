@@ -547,5 +547,6 @@ window.onload = function() {
 // register service worker
 if (navigator && navigator.serviceWorker) {
   navigator.serviceWorker.register('service_worker.js').then(function (registration) {
+		console.log('PWA Supported. You can use this APP offline!')
   });
 }

@@ -1,4 +1,4 @@
-var cacheStorageKey = 'version 5.0.0';
+var cacheStorageKey = 'version 5.0.1';
 
 var cacheList = [
   '/',
